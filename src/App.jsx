@@ -224,6 +224,51 @@ export default function HoneycombPixelArt() {
     URL.revokeObjectURL(url);
   }, []);
 
+  const downloadImage = useCallback((format) => {
+    const svgElement = document.getElementById('honeycomb-svg');
+    if (!svgElement) return;
+
+    const svgData = new XMLSerializer().serializeToString(svgElement);
+    const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(svgBlob);
+
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      // 高解像度のために2倍のスケールを使用
+      const scale = 2;
+      canvas.width = svgDimensions.width * scale;
+      canvas.height = svgDimensions.height * scale;
+
+      const ctx = canvas.getContext('2d');
+      ctx.scale(scale, scale);
+
+      // PNG以外の場合は背景色を設定（透明度がないため）
+      if (format === 'jpeg') {
+        ctx.fillStyle = '#1a1a2e';
+        ctx.fillRect(0, 0, svgDimensions.width, svgDimensions.height);
+      }
+
+      ctx.drawImage(img, 0, 0, svgDimensions.width, svgDimensions.height);
+
+      const mimeType = format === 'jpeg' ? 'image/jpeg' : 'image/png';
+      const quality = format === 'jpeg' ? 0.95 : undefined;
+
+      canvas.toBlob((blob) => {
+        const downloadUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = downloadUrl;
+        a.download = `honeycomb-pixelart.${format}`;
+        a.click();
+        URL.revokeObjectURL(downloadUrl);
+      }, mimeType, quality);
+
+      URL.revokeObjectURL(url);
+    };
+
+    img.src = url;
+  }, [svgDimensions]);
+
   return (
     <div style={{
       minHeight: '100vh',
@@ -424,38 +469,54 @@ export default function HoneycombPixelArt() {
             <span style={{ fontSize: '0.875rem', color: '#94a3b8' }}>Show Borders</span>
           </label>
 
-          {/* Download Button */}
+          {/* Download Select */}
           {hexagons.length > 0 && (
-            <button
-              onClick={downloadSVG}
-              style={{
-                background: 'rgba(255,255,255,0.1)',
-                color: '#e8e8e8',
-                border: '1px solid rgba(255,255,255,0.2)',
-                borderRadius: '12px',
-                padding: '14px 28px',
-                fontSize: '1rem',
-                fontWeight: 600,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                transition: 'all 0.2s'
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.background = 'rgba(255,255,255,0.15)';
-                e.target.style.borderColor = 'rgba(255,255,255,0.3)';
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.background = 'rgba(255,255,255,0.1)';
-                e.target.style.borderColor = 'rgba(255,255,255,0.2)';
-              }}
-            >
-              <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#e8e8e8">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
               </svg>
-              Download SVG
-            </button>
+              <select
+                defaultValue=""
+                onChange={(e) => {
+                  const format = e.target.value;
+                  if (format === 'svg') {
+                    downloadSVG();
+                  } else if (format) {
+                    downloadImage(format);
+                  }
+                  e.target.value = '';
+                }}
+                style={{
+                  background: 'rgba(255,255,255,0.1)',
+                  color: '#e8e8e8',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  borderRadius: '12px',
+                  padding: '14px 20px',
+                  fontSize: '1rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  appearance: 'none',
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23e8e8e8' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E")`,
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'right 12px center',
+                  paddingRight: '40px',
+                  minWidth: '180px'
+                }}
+              >
+                <option value="" disabled style={{ background: '#1e293b', color: '#94a3b8' }}>
+                  Download
+                </option>
+                <option value="svg" style={{ background: '#1e293b', color: '#e8e8e8' }}>
+                  SVG
+                </option>
+                <option value="png" style={{ background: '#1e293b', color: '#e8e8e8' }}>
+                  PNG
+                </option>
+                <option value="jpeg" style={{ background: '#1e293b', color: '#e8e8e8' }}>
+                  JPEG
+                </option>
+              </select>
+            </div>
           )}
         </div>
 
