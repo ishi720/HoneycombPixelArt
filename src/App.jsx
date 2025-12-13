@@ -1,4 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
+import './App.css';
 
 // Cube Coordinates System for Hexagonal Grid
 // Each hex has coordinates (q, r, s) where q + r + s = 0
