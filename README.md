@@ -2,6 +2,11 @@
 
 画像ファイルをハニカムピクセルに変換するサービス
 
+## Badge
+
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/5bfcdf3c900d41dfa7b7edf8a67ae935)](https://app.codacy.com/gh/ishi720/HoneycombPixelArt/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+
+
 ## Sample
 ### Before
 ![68a52c66dec24a7aebfcf3500a6c530d](https://github.com/user-attachments/assets/ac849177-d4b9-42cf-a1bd-9e7331ca7a05)
