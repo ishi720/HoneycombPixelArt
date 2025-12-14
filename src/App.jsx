@@ -36,8 +36,11 @@ export default function HoneycombPixelArt() {
   const [svgDimensions, setSvgDimensions] = useState({ width: 600, height: 400 });
   const [isProcessing, setIsProcessing] = useState(false);
   const [showStroke, setShowStroke] = useState(true);
+  const [isDragging, setIsDragging] = useState(false);
   const canvasRef = useRef(null);
   const fileInputRef = useRef(null);
+  const dropZoneRef = useRef(null);
+  const dragCounterRef = useRef(0);
 
   const getPixelColor = useCallback((imageData, x, y, width, height) => {
     if (x < 0 || x >= width || y < 0 || y >= height) {
@@ -196,9 +199,9 @@ export default function HoneycombPixelArt() {
     return fullFileName.substring(0, lastDotIndex);
   };
 
-  const handleImageUpload = useCallback((e) => {
-    const file = e.target.files[0];
-    if (file) {
+  // 共通の画像処理関数
+  const processFile = useCallback((file) => {
+    if (file && file.type.startsWith('image/')) {
       // ファイル名を保存（拡張子を除去）
       const baseName = getBaseFileName(file.name);
       setFileName(baseName);
@@ -215,6 +218,50 @@ export default function HoneycombPixelArt() {
       reader.readAsDataURL(file);
     }
   }, [processImage]);
+
+  const handleImageUpload = useCallback((e) => {
+    const file = e.target.files[0];
+    if (file) {
+      processFile(file);
+    }
+  }, [processFile]);
+
+  // ドラッグ&ドロップ イベントハンドラー
+  const handleDragEnter = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounterRef.current++;
+    if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
+      setIsDragging(true);
+    }
+  }, []);
+
+  const handleDragLeave = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounterRef.current--;
+    if (dragCounterRef.current === 0) {
+      setIsDragging(false);
+    }
+  }, []);
+
+  const handleDragOver = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  }, []);
+
+  const handleDrop = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    dragCounterRef.current = 0;
+
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      processFile(file);
+    }
+  }, [processFile]);
 
   useEffect(() => {
     if (image) {
@@ -283,16 +330,70 @@ export default function HoneycombPixelArt() {
   }, [svgDimensions, fileName]);
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
-      fontFamily: '"Outfit", system-ui, sans-serif',
-      color: '#e8e8e8',
-      padding: '24px',
-      position: 'relative',
-      overflow: 'hidden'
-    }}>
+    <div
+      style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
+        fontFamily: '"Outfit", system-ui, sans-serif',
+        color: '#e8e8e8',
+        padding: '24px',
+        position: 'relative',
+        overflow: 'hidden'
+      }}
+      onDragEnter={handleDragEnter}
+      onDragLeave={handleDragLeave}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+    >
       <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet" />
+
+      {/* Drag Overlay */}
+      {isDragging && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(245, 158, 11, 0.1)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 1000,
+          border: '4px dashed #f59e0b',
+          margin: '16px',
+          borderRadius: '24px'
+        }}>
+          <div style={{
+            textAlign: 'center',
+            color: '#f59e0b'
+          }}>
+            <svg width="80" height="80" viewBox="0 0 48 48" style={{ marginBottom: '16px' }}>
+              <polygon
+                points="24,4 42,14 42,34 24,44 6,34 6,14"
+                fill="none"
+                stroke="#f59e0b"
+                strokeWidth="2"
+              />
+              <path
+                d="M24 16v12M18 22l6-6 6 6"
+                stroke="#f59e0b"
+                strokeWidth="2"
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <p style={{ fontSize: '1.5rem', fontWeight: 600, margin: '0 0 8px' }}>
+              Drop your image here
+            </p>
+            <p style={{ fontSize: '1rem', margin: 0, opacity: 0.8 }}>
+              Release to transform into hexagonal art
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Background Pattern */}
       <div style={{
@@ -531,18 +632,21 @@ export default function HoneycombPixelArt() {
         </div>
 
         {/* Canvas Preview Area */}
-        <div style={{
-          background: 'rgba(0,0,0,0.3)',
-          borderRadius: '16px',
-          padding: '24px',
-          border: '1px solid rgba(255,255,255,0.1)',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          minHeight: '450px',
-          position: 'relative',
-          overflow: 'auto'
-        }}>
+        <div
+          ref={dropZoneRef}
+          style={{
+            background: 'rgba(0,0,0,0.3)',
+            borderRadius: '16px',
+            padding: '24px',
+            border: '1px solid rgba(255,255,255,0.1)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            minHeight: '450px',
+            position: 'relative',
+            overflow: 'auto'
+          }}
+        >
           {/* Hidden canvas for image processing */}
           <canvas ref={canvasRef} style={{ display: 'none' }} />
 
@@ -583,7 +687,9 @@ export default function HoneycombPixelArt() {
                 />
               </svg>
               <p style={{ fontSize: '1.125rem', margin: '0 0 8px' }}>No image loaded</p>
-              <p style={{ fontSize: '0.875rem', margin: 0 }}>Upload an image to transform it into hexagonal art</p>
+              <p style={{ fontSize: '0.875rem', margin: 0 }}>
+                Upload an image or <strong style={{ color: '#f59e0b' }}>drag & drop</strong> to transform it into hexagonal art
+              </p>
             </div>
           ) : (
             <svg
