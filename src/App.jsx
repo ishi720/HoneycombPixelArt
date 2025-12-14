@@ -84,7 +84,7 @@ export default function HoneycombPixelArt() {
     setIsProcessing(true);
 
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
 
     const maxWidth = 800;
     const maxHeight = 600;
