@@ -243,11 +243,12 @@ export default function HoneycombPixelArt() {
       const ctx = canvas.getContext('2d');
       ctx.scale(scale, scale);
 
-      // PNG以外の場合は背景色を設定（透明度がないため）
+      // JPEGの場合のみ背景色を設定
       if (format === 'jpeg') {
-        ctx.fillStyle = '#1a1a2e';
+        ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, svgDimensions.width, svgDimensions.height);
       }
+      // PNGの場合は背景を描画しない（透明になる）
 
       ctx.drawImage(img, 0, 0, svgDimensions.width, svgDimensions.height);
 
@@ -589,7 +590,7 @@ export default function HoneycombPixelArt() {
                 display: 'block'
               }}
             >
-              <rect width={svgDimensions.width} height={svgDimensions.height} fill="#1a1a2e" />
+              {/* 背景なし */}
               {hexagons.map((hex, index) => (
                 <Hexagon
                   key={`${hex.col}-${hex.row}-${index}`}
