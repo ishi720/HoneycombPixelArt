@@ -171,15 +171,16 @@ export default function HoneycombPixelArt() {
       }
     }
 
-    // Add padding to SVG dimensions
+    // SVGの幅と高さを計算する
     const svgPadding = hexSize;
     const svgWidth = Math.ceil(maxX - minX + svgPadding * 2);
     const svgHeight = Math.ceil(maxY - minY + svgPadding * 2);
 
-    // Adjust hexagon positions relative to SVG origin
+    // 六角形の位置を調整する
     const offsetX = -minX + svgPadding;
     const offsetY = -minY + svgPadding;
 
+    // 六角形の位置を調整した新しい配列を作成
     const adjustedHexagons = newHexagons.map(hex => ({
       ...hex,
       x: hex.x + offsetX,
@@ -414,7 +415,7 @@ export default function HoneycombPixelArt() {
           <div style={{
             display: 'inline-flex',
             alignItems: 'center',
-            gap: '16px',
+            gap: '8px',
             marginBottom: '8px'
           }}>
             <svg width="48" height="48" viewBox="0 0 48 48">
@@ -449,9 +450,10 @@ export default function HoneycombPixelArt() {
             color: '#94a3b8',
             fontSize: '1rem',
             margin: 0,
-            fontWeight: 300
+            fontWeight: 300,
+            fontFamily: 'sans-serif, "Outfit", system-ui'
           }}>
-            Transform images into hexagonal masterpieces using Cube Coordinates
+            画像ファイルをハニカムピクセルに変換するサービスです。
           </p>
         </header>
 
