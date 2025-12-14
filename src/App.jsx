@@ -29,6 +29,7 @@ const Hexagon = ({ x, y, size, fill, stroke }) => {
 
 export default function HoneycombPixelArt() {
   const [image, setImage] = useState(null);
+  const [fileName, setFileName] = useState('honeycomb-pixelart');
   const [hexSize, setHexSize] = useState(12);
   const [hexagons, setHexagons] = useState([]);
   const [dimensions, setDimensions] = useState({ width: 600, height: 400 });
@@ -188,9 +189,20 @@ export default function HoneycombPixelArt() {
     setIsProcessing(false);
   }, [hexSize, getAverageColor]);
 
+  // ファイル名から拡張子を除去するヘルパー関数
+  const getBaseFileName = (fullFileName) => {
+    const lastDotIndex = fullFileName.lastIndexOf('.');
+    if (lastDotIndex === -1) return fullFileName;
+    return fullFileName.substring(0, lastDotIndex);
+  };
+
   const handleImageUpload = useCallback((e) => {
     const file = e.target.files[0];
     if (file) {
+      // ファイル名を保存（拡張子を除去）
+      const baseName = getBaseFileName(file.name);
+      setFileName(baseName);
+
       const reader = new FileReader();
       reader.onload = (event) => {
         const img = new Image();
@@ -219,10 +231,10 @@ export default function HoneycombPixelArt() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'honeycomb-pixelart.svg';
+    a.download = `${fileName}-honeycomb.svg`;
     a.click();
     URL.revokeObjectURL(url);
-  }, []);
+  }, [fileName]);
 
   const downloadImage = useCallback((format) => {
     const svgElement = document.getElementById('honeycomb-svg');
@@ -259,7 +271,7 @@ export default function HoneycombPixelArt() {
         const downloadUrl = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = downloadUrl;
-        a.download = `honeycomb-pixelart.${format}`;
+        a.download = `${fileName}_honeycomb.${format}`;
         a.click();
         URL.revokeObjectURL(downloadUrl);
       }, mimeType, quality);
@@ -268,7 +280,7 @@ export default function HoneycombPixelArt() {
     };
 
     img.src = url;
-  }, [svgDimensions]);
+  }, [svgDimensions, fileName]);
 
   return (
     <div style={{
