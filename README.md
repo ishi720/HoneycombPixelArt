@@ -6,6 +6,10 @@
 
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/5bfcdf3c900d41dfa7b7edf8a67ae935)](https://app.codacy.com/gh/ishi720/HoneycombPixelArt/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 
+## 技術スタック
+
+- React 19
+- Vite 7
 
 ## Sample
 ### Before
@@ -13,3 +17,4 @@
 
 ### After
 <img width="739" height="558" alt="image" src="https://github.com/user-attachments/assets/b84e0b73-a8fb-4d6f-bcd5-72e7d5fbd93d" />
+
