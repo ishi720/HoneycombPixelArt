@@ -473,9 +473,6 @@ export default function HoneycombPixelArt() {
           {/* Download Select */}
           {hexagons.length > 0 && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#e8e8e8">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-              </svg>
               <select
                 defaultValue=""
                 onChange={(e) => {
@@ -585,8 +582,6 @@ export default function HoneycombPixelArt() {
               style={{
                 maxWidth: '100%',
                 height: 'auto',
-                borderRadius: '8px',
-                boxShadow: '0 20px 60px rgba(0,0,0,0.4)',
                 display: 'block'
               }}
             >
