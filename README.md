@@ -18,3 +18,20 @@
 ### After
 <img width="739" height="558" alt="image" src="https://github.com/user-attachments/assets/b84e0b73-a8fb-4d6f-bcd5-72e7d5fbd93d" />
 
+## セットアップ
+
+```bash
+# リポジトリをクローン
+git clone https://github.com/ishi720/HoneycombPixelArt.git
+
+# ディレクトリに移動
+cd HoneycombPixelArt
+
+# 依存関係をインストール
+npm install
+
+# 開発サーバーを起動
+npm run dev
+```
+
+ブラウザで http://localhost:5173 を確認
